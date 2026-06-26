@@ -5,11 +5,17 @@ Analyzes skin images and detects skin conditions using Google's AI.
 This is the core AI engine for the platform.
 """
 
-from google.cloud import vision
-from google.oauth2 import service_account
 import json
 import os
 from dotenv import load_dotenv
+
+try:
+    from google.cloud import vision
+    from google.oauth2 import service_account
+    VISION_AVAILABLE = True
+except ImportError:
+    print("WARNING: Google Cloud Vision not available - using mock analysis")
+    VISION_AVAILABLE = False
 
 load_dotenv()
 
@@ -18,6 +24,9 @@ def get_vision_client():
     """
     Initialize Google Cloud Vision client using credentials
     """
+    if not VISION_AVAILABLE:
+        return None
+
     credentials_path = os.getenv("GOOGLE_CLOUD_CREDENTIALS_PATH", "./credentials/google-cloud-key.json")
 
     if not os.path.exists(credentials_path):
